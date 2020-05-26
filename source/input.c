@@ -637,6 +637,7 @@ int input_read_parameters(
   double n_cor=0.;
   double c_cor=0.;
   double stat_f_idr = 7./8.;
+  double alpha_iso =0., A_glob=0.; /* GFA */
 
   double Omega_tot;
 
@@ -1894,6 +1895,20 @@ int input_read_parameters(
 
   class_read_double("k_pivot",ppm->k_pivot);
 
+  /** GFA: do we want Beltran parametrization on isocurvature perturbations? */
+  class_call(parser_read_string(pfc,"use_Beltran_params",&string1,&flag1,errmsg),
+             errmsg,
+             errmsg);
+
+  if (flag1 == _TRUE_){
+    if((strstr(string1,"y") != NULL) || (strstr(string1,"Y") != NULL)){
+      ppm->use_Beltran_params = _TRUE_;
+    }
+    else {
+     ppm->use_Beltran_params   = _FALSE_;
+    }
+  }
+
   if (ppm->primordial_spec_type == two_scales) {
 
     class_read_double("k1",k1);
@@ -2021,19 +2036,22 @@ int input_read_parameters(
 
     if (ppt->has_scalars == _TRUE_) {
 
-      class_call(parser_read_double(pfc,"A_s",&param1,&flag1,errmsg),
-                 errmsg,
-                 errmsg);
-      class_call(parser_read_double(pfc,"ln10^{10}A_s",&param2,&flag2,errmsg),
-                 errmsg,
-                 errmsg);
-      class_test((flag1 == _TRUE_) && (flag2 == _TRUE_),
-                 errmsg,
-                 "In input file, you cannot enter both A_s and ln10^{10}A_s, choose one");
-      if (flag1 == _TRUE_)
-        ppm->A_s = param1;
-      else if (flag2 == _TRUE_)
-        ppm->A_s = exp(param2)*1.e-10;
+      if (ppm->use_Beltran_params == _FALSE_) { /* GFA */
+        class_call(parser_read_double(pfc,"A_s",&param1,&flag1,errmsg),
+                   errmsg,
+                   errmsg);
+        class_call(parser_read_double(pfc,"ln10^{10}A_s",&param2,&flag2,errmsg),
+                   errmsg,
+                   errmsg);
+        class_test((flag1 == _TRUE_) && (flag2 == _TRUE_),
+                   errmsg,
+                   "In input file, you cannot enter both A_s and ln10^{10}A_s, choose one");
+        if (flag1 == _TRUE_)
+          ppm->A_s = param1;
+        else if (flag2 == _TRUE_)
+          ppm->A_s = exp(param2)*1.e-10;
+      }
+
 
       if (ppt->has_ad == _TRUE_) {
 
@@ -2052,7 +2070,16 @@ int input_read_parameters(
 
       if (ppt->has_cdi == _TRUE_) {
 
-        class_read_double("f_cdi",ppm->f_cdi);
+        if (ppm->use_Beltran_params == _FALSE_) { /* GFA */
+         class_read_double("f_cdi",ppm->f_cdi);
+        } else {
+         class_read_double("alpha_iso",alpha_iso);
+         class_read_double("A_glob",A_glob);
+         ppm->f_cdi = sqrt(alpha_iso/(1.-alpha_iso));
+         ppm->A_s = A_glob/(1.+pow(ppm->f_cdi,2));
+        }
+
+
         class_read_double("n_cdi",ppm->n_cdi);
         class_read_double("alpha_cdi",ppm->alpha_cdi);
 
@@ -3326,6 +3353,7 @@ int input_default_params(
 
   /** - primordial structure */
 
+  ppm->use_Beltran_params = _FALSE_; /* GFA */
   ppm->primordial_spec_type = analytic_Pk;
   ppm->k_pivot = 0.05;
   ppm->A_s = 2.215e-9;
