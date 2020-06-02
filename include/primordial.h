@@ -293,8 +293,7 @@ struct primordial {
   //@{
 
   short primordial_verbose; /**< flag regulating the amount of information sent to standard output (none if set to zero) */
-  short use_Beltran_params; /** GFA: do we want to use the parametrization for isocurvature modes from Beltran et al. (arXiv : 0509209) ? */
-
+  short use_Beltran_cdi; /** GFA: do we want to use the parametrization for isocurvature modes from Beltran et al. (arXiv : 0509209) ? */
   //@}
 
   ErrorMsg error_message; /**< zone for writing error messages */
