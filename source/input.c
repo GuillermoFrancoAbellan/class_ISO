@@ -1922,7 +1922,7 @@ int input_read_parameters(
       class_read_double("P_{RR}^2",prr2);
       class_test(prr1<=0.,errmsg,"enter strictly positive scale P_{RR}^1");
       class_test(prr2<=0.,errmsg,"enter strictly positive scale P_{RR}^2");
-
+      
       ppm->n_s = log(prr2/prr1)/log(k2/k1)+1.;
       ppm->A_s = prr1*exp((ppm->n_s-1.)*log(ppm->k_pivot/k1));
 
