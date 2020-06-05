@@ -626,6 +626,7 @@ int input_read_parameters(
   char string2[_ARGUMENT_LENGTH_MAX_];
   double k1=0.;
   double k2=0.;
+  double k1_planck=0.002, k2_planck=0.1; /* GFA */
   double prr1=0.;
   double prr2=0.;
   double pii1=0.;
@@ -638,7 +639,7 @@ int input_read_parameters(
   double c_cor=0.;
   double stat_f_idr = 7./8.;
   double alpha_iso =0., A_glob=0.; /* GFA */
-  double elipse=0.; /*RCB*/
+  double ellipse=0.; /*RCB*/
   double Omega_tot;
 
   int i;
@@ -1904,11 +1905,9 @@ int input_read_parameters(
     if((strstr(string1,"y") != NULL) || (strstr(string1,"Y") != NULL)){
       ppm->use_Beltran_cdi = _TRUE_;
       ppt->has_cdi = _TRUE_;
-      printf("IM HERE!!!\n");
     }
     else {
      ppm->use_Beltran_cdi   = _FALSE_;
-     printf("IM not HERE!!!\n");
     }
   }
 
@@ -1927,7 +1926,7 @@ int input_read_parameters(
       class_read_double("P_{RR}^2",prr2);
       class_test(prr1<=0.,errmsg,"enter strictly positive scale P_{RR}^1");
       class_test(prr2<=0.,errmsg,"enter strictly positive scale P_{RR}^2");
-      
+
       ppm->n_s = log(prr2/prr1)/log(k2/k1)+1.;
       ppm->A_s = prr1*exp((ppm->n_s-1.)*log(ppm->k_pivot/k1));
 
@@ -2062,7 +2061,6 @@ int input_read_parameters(
 
         class_read_double("n_s",ppm->n_s);
         class_read_double("alpha_s",ppm->alpha_s);
-        printf("has_ad=TRUE\n");
       }
 
       if (ppt->has_bi == _TRUE_) {
@@ -2074,12 +2072,10 @@ int input_read_parameters(
       }
 
       if (ppt->has_cdi == _TRUE_) {
-	printf("has_cdi = TRUE\n");
         if (ppm->use_Beltran_cdi == _FALSE_) { /* GFA */
          class_read_double("f_cdi",ppm->f_cdi);
         }
-	else if (ppm->use_Beltran_cdi == _TRUE_) {
-	 printf("IM HERE\n");
+      	else {
          class_read_double("alpha_iso",alpha_iso);
          class_read_double("A_glob",A_glob);
          ppm->f_cdi = sqrt(alpha_iso/(1.-alpha_iso));
@@ -2089,6 +2085,13 @@ int input_read_parameters(
 
         class_read_double("n_cdi",ppm->n_cdi);
         class_read_double("alpha_cdi",ppm->alpha_cdi);
+
+        /* GFA: these quantities are being computed  only when we have some cdi isocurvature,
+         for both Beltran parametrization and the standard CLASS parametrization */
+        ppm->P_RR_1 = ppm->A_s*exp((ppm->n_s-1.)*log(k1_planck/ppm->k_pivot));
+        ppm->P_RR_2 = ppm->A_s*exp((ppm->n_s-1.)*log(k2_planck/ppm->k_pivot));
+        ppm->P_II_1 = ppm->A_s*pow(ppm->f_cdi,2)*exp((ppm->n_cdi-1.)*log(k1_planck/ppm->k_pivot));
+        ppm->P_II_2 = ppm->A_s*pow(ppm->f_cdi,2)*exp((ppm->n_cdi-1.)*log(k2_planck/ppm->k_pivot));
 
       }
 
@@ -2115,16 +2118,15 @@ int input_read_parameters(
       }
 
       if ((ppt->has_ad == _TRUE_) && (ppt->has_cdi == _TRUE_)) {  /*RCB*/
-	if (ppm->use_Beltran_cdi == _FALSE_){
-        class_read_double_one_of_two("c_ad_cdi","c_cdi_ad",ppm->c_ad_cdi);
-        class_read_double_one_of_two("n_ad_cdi","n_cdi_ad",ppm->n_ad_cdi);
-        class_read_double_one_of_two("alpha_ad_cdi","alpha_cdi_ad",ppm->alpha_ad_cdi);
-	}
-	else if (ppm->use_Beltran_cdi == _TRUE_) {
-	class_read_double("elipse",elipse);
-        class_read_double_one_of_two("n_ad_cdi","n_cdi_ad",ppm->n_ad_cdi);
-        class_read_double_one_of_two("alpha_ad_cdi","alpha_cdi_ad",ppm->alpha_ad_cdi);
-	ppm->c_ad_cdi = 0.5*elipse / sqrt(alpha_iso*(1-alpha_iso));}
+	     if (ppm->use_Beltran_cdi == _FALSE_){
+         class_read_double_one_of_two("c_ad_cdi","c_cdi_ad",ppm->c_ad_cdi);
+         class_read_double_one_of_two("n_ad_cdi","n_cdi_ad",ppm->n_ad_cdi);
+         class_read_double_one_of_two("alpha_ad_cdi","alpha_cdi_ad",ppm->alpha_ad_cdi);
+	     } else {
+	       class_read_double("ellipse",ellipse);
+         class_read_double_one_of_two("n_ad_cdi","n_cdi_ad",ppm->n_ad_cdi);
+         class_read_double_one_of_two("alpha_ad_cdi","alpha_cdi_ad",ppm->alpha_ad_cdi);
+	       ppm->c_ad_cdi = 0.5*ellipse / sqrt(alpha_iso*(1-alpha_iso));}
       }
 
       if ((ppt->has_ad == _TRUE_) && (ppt->has_nid == _TRUE_)) {
@@ -3378,6 +3380,10 @@ int input_default_params(
   ppm->alpha_bi = 0.;
   ppm->f_cdi = 1.;
   ppm->n_cdi = 1.;
+  ppm->P_RR_1 = ppm->A_s*exp((ppm->n_s-1.)*log(0.002/ppm->k_pivot)); /* GFA */
+  ppm->P_RR_2 = ppm->A_s*exp((ppm->n_s-1.)*log(0.1/ppm->k_pivot)); /* GFA */
+  ppm->P_II_1 = ppm->A_s*pow(ppm->f_cdi,2)*exp((ppm->n_cdi-1.)*log(0.002/ppm->k_pivot)); /* GFA */
+  ppm->P_II_2 = ppm->A_s*pow(ppm->f_cdi,2)*exp((ppm->n_cdi-1.)*log(0.1/ppm->k_pivot)); /* GFA */
   ppm->alpha_cdi = 0.;
   ppm->f_nid = 1.;
   ppm->n_nid = 1.;

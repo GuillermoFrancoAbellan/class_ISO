@@ -1055,6 +1055,20 @@ cdef class Class:
     def n_s(self):
         return self.pm.n_s
 
+#GFA
+
+    def P_RR_1(self):
+        return self.pm.P_RR_1
+
+    def P_RR_2(self):
+        return self.pm.P_RR_2
+
+    def P_II_1(self):
+        return self.pm.P_II_1
+
+    def P_II_2(self):
+        return self.pm.P_II_2
+
     def tau_reio(self):
         return self.th.tau_reio
 
@@ -1758,6 +1772,15 @@ cdef class Class:
                 value = log(1.e10*self.pm.A_s)
             elif name == 'n_s':
                 value = self.pm.n_s
+#GFA
+            elif name == 'P_RR_1':
+                value = self.pm.P_RR_1
+            elif name == 'P_RR_2':
+                value = self.pm.P_RR_2
+            elif name == 'P_II_1':
+                value = self.pm.P_II_1
+            elif name == 'P_II_2':
+                value = self.pm.P_II_2
             elif name == 'alpha_s':
                 value = self.pm.alpha_s
             elif name == 'beta_s':

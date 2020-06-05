@@ -107,6 +107,11 @@ struct primordial {
   double n_cdi;  /**< CDI tilt */
   double alpha_cdi; /**< CDI running */
 
+  double P_RR_1; /* GFA: adiabatic power spectrum at k1=0.002 Mpc^{-1}, for comparison with Planck 2018 */
+  double P_RR_2;  /* GFA: adiabatic power spectrum at k2=0.1 Mpc^{-1}, for comparison with Planck 2018 */
+  double P_II_1; /* GFA: isocurvature power spectrum at k1=0.002 Mpc^{-1}, for comparison with Planck 2018 */
+  double P_II_2;  /* GFA: isocurvature power spectrum at k2=0.1 Mpc^{-1}, for comparison with Planck 2018 */
+
   double f_nid;  /**< neutrino density isocurvature (NID) entropy-to-curvature ratio \f$ S_{nid}/R \f$*/
   double n_nid;  /**< NID tilt */
   double alpha_nid; /**< NID running */
