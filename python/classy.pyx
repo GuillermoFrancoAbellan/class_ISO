@@ -1069,6 +1069,12 @@ cdef class Class:
     def P_II_2(self):
         return self.pm.P_II_2
 
+    def P_RI_1(self):
+        return self.pm.P_RI_1
+
+    def P_RI_2(self):
+        return self.pm.P_RI_2
+
     def tau_reio(self):
         return self.th.tau_reio
 
@@ -1781,6 +1787,10 @@ cdef class Class:
                 value = self.pm.P_II_1
             elif name == 'P_II_2':
                 value = self.pm.P_II_2
+            elif name == 'P_RI_1':
+                value = self.pm.P_RI_1
+            elif name == 'P_RI_2':
+                value = self.pm.P_RI_2
             elif name == 'alpha_s':
                 value = self.pm.alpha_s
             elif name == 'beta_s':

@@ -1995,7 +1995,7 @@ int input_read_parameters(
           class_test((pii1*prr1<=0.),errmsg,"should NEVER happen");
           class_test(fabs(pri1)/sqrt(pii1*prr1)>1,errmsg,"too large ad-iso cross-correlation in k1");
           class_test(fabs(pri1)/sqrt(pii1*prr1)*exp(n_cor*log(k2/k1))>1,errmsg,"too large ad-iso cross-correlation in k2");
-          c_cor = -pri1/sqrt(pii1*prr1)*exp(n_cor*log(ppm->k_pivot/k1));
+          c_cor = -pri1/sqrt(pii1*prr1)*exp(n_cor*log(ppm->k_pivot/k1)); /* GFA: why this - sign? */
         }
         /* formula for f_iso valid in all cases */
         class_test((pii1==0.) || (prr1 == 0.) || (pii1*prr1<0.),errmsg,"should NEVER happen");
@@ -2126,7 +2126,12 @@ int input_read_parameters(
 	       class_read_double("ellipse",ellipse);
          class_read_double_one_of_two("n_ad_cdi","n_cdi_ad",ppm->n_ad_cdi);
          class_read_double_one_of_two("alpha_ad_cdi","alpha_cdi_ad",ppm->alpha_ad_cdi);
-	       ppm->c_ad_cdi = 0.5*ellipse / sqrt(alpha_iso*(1-alpha_iso));}
+	       ppm->c_ad_cdi = 0.5*ellipse / sqrt(alpha_iso*(1-alpha_iso));
+       }
+       /* GFA: these quantities are being computed  only when we have some cdi isocurvature,
+        for both Beltran parametrization and the standard CLASS parametrization */
+        ppm->P_RI_1  = ppm->A_s*ppm->f_cdi*ppm->c_ad_cdi*exp((ppm->n_ad_cdi+0.5*(ppm->n_s+ppm->n_cdi-2.))*log(k1_planck/ppm->k_pivot));
+        ppm->P_RI_2  = ppm->A_s*ppm->f_cdi*ppm->c_ad_cdi*exp((ppm->n_ad_cdi+0.5*(ppm->n_s+ppm->n_cdi-2.))*log(k2_planck/ppm->k_pivot));
       }
 
       if ((ppt->has_ad == _TRUE_) && (ppt->has_nid == _TRUE_)) {
@@ -3397,6 +3402,8 @@ int input_default_params(
   ppm->c_ad_cdi = 0.;
   ppm->n_ad_cdi = 0.;
   ppm->alpha_ad_cdi = 0.;
+  ppm->P_RI_1 = ppm->A_s*ppm->f_cdi*ppm->c_ad_cdi*exp((ppm->n_ad_cdi+0.5*(ppm->n_s+ppm->n_cdi-2.))*log(0.02/ppm->k_pivot)); /* GFA */
+  ppm->P_RI_2 = ppm->A_s*ppm->f_cdi*ppm->c_ad_cdi*exp((ppm->n_ad_cdi+0.5*(ppm->n_s+ppm->n_cdi-2.))*log(0.1/ppm->k_pivot));  /* GFA */
   ppm->c_ad_nid = 0.;
   ppm->n_ad_nid = 0.;
   ppm->alpha_ad_nid = 0.;
