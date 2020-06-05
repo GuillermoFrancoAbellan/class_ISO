@@ -638,7 +638,7 @@ int input_read_parameters(
   double c_cor=0.;
   double stat_f_idr = 7./8.;
   double alpha_iso =0., A_glob=0.; /* GFA */
-
+  double elipse=0.; /*RCB*/
   double Omega_tot;
 
   int i;
@@ -1896,18 +1896,23 @@ int input_read_parameters(
   class_read_double("k_pivot",ppm->k_pivot);
 
   /** GFA: do we want Beltran parametrization on isocurvature perturbations? */
-  class_call(parser_read_string(pfc,"use_Beltran_params",&string1,&flag1,errmsg),
+  class_call(parser_read_string(pfc,"use_Beltran_cdi",&string1,&flag1,errmsg),
              errmsg,
              errmsg);
 
   if (flag1 == _TRUE_){
     if((strstr(string1,"y") != NULL) || (strstr(string1,"Y") != NULL)){
-      ppm->use_Beltran_params = _TRUE_;
+      ppm->use_Beltran_cdi = _TRUE_;
+      ppt->has_cdi = _TRUE_;
+      printf("IM HERE!!!\n");
     }
     else {
-     ppm->use_Beltran_params   = _FALSE_;
+     ppm->use_Beltran_cdi   = _FALSE_;
+     printf("IM not HERE!!!\n");
     }
   }
+
+
 
   if (ppm->primordial_spec_type == two_scales) {
 
@@ -2036,7 +2041,7 @@ int input_read_parameters(
 
     if (ppt->has_scalars == _TRUE_) {
 
-      if (ppm->use_Beltran_params == _FALSE_) { /* GFA */
+      if (ppm->use_Beltran_cdi == _FALSE_) { /* GFA */
         class_call(parser_read_double(pfc,"A_s",&param1,&flag1,errmsg),
                    errmsg,
                    errmsg);
@@ -2057,7 +2062,7 @@ int input_read_parameters(
 
         class_read_double("n_s",ppm->n_s);
         class_read_double("alpha_s",ppm->alpha_s);
-
+        printf("has_ad=TRUE\n");
       }
 
       if (ppt->has_bi == _TRUE_) {
@@ -2069,10 +2074,12 @@ int input_read_parameters(
       }
 
       if (ppt->has_cdi == _TRUE_) {
-
-        if (ppm->use_Beltran_params == _FALSE_) { /* GFA */
+	printf("has_cdi = TRUE\n");
+        if (ppm->use_Beltran_cdi == _FALSE_) { /* GFA */
          class_read_double("f_cdi",ppm->f_cdi);
-        } else {
+        }
+	else if (ppm->use_Beltran_cdi == _TRUE_) {
+	 printf("IM HERE\n");
          class_read_double("alpha_iso",alpha_iso);
          class_read_double("A_glob",A_glob);
          ppm->f_cdi = sqrt(alpha_iso/(1.-alpha_iso));
@@ -2107,10 +2114,17 @@ int input_read_parameters(
         class_read_double_one_of_two("alpha_ad_bi","alpha_bi_ad",ppm->alpha_ad_bi);
       }
 
-      if ((ppt->has_ad == _TRUE_) && (ppt->has_cdi == _TRUE_)) {
+      if ((ppt->has_ad == _TRUE_) && (ppt->has_cdi == _TRUE_)) {  /*RCB*/
+	if (ppm->use_Beltran_cdi == _FALSE_){
         class_read_double_one_of_two("c_ad_cdi","c_cdi_ad",ppm->c_ad_cdi);
         class_read_double_one_of_two("n_ad_cdi","n_cdi_ad",ppm->n_ad_cdi);
         class_read_double_one_of_two("alpha_ad_cdi","alpha_cdi_ad",ppm->alpha_ad_cdi);
+	}
+	else if (ppm->use_Beltran_cdi == _TRUE_) {
+	class_read_double("elipse",elipse);
+        class_read_double_one_of_two("n_ad_cdi","n_cdi_ad",ppm->n_ad_cdi);
+        class_read_double_one_of_two("alpha_ad_cdi","alpha_cdi_ad",ppm->alpha_ad_cdi);
+	ppm->c_ad_cdi = 0.5*elipse / sqrt(alpha_iso*(1-alpha_iso));}
       }
 
       if ((ppt->has_ad == _TRUE_) && (ppt->has_nid == _TRUE_)) {
@@ -2132,7 +2146,7 @@ int input_read_parameters(
       }
 
       if ((ppt->has_bi == _TRUE_) && (ppt->has_nid == _TRUE_)) {
-        class_read_double_one_of_two("c_bi_nid","c_nid_bi",ppm->c_bi_nid);
+         class_read_double_one_of_two("c_bi_nid","c_nid_bi",ppm->c_bi_nid);
         class_read_double_one_of_two("n_bi_nid","n_nid_bi",ppm->n_bi_nid);
         class_read_double_one_of_two("alpha_bi_nid","alpha_nid_bi",ppm->alpha_bi_nid);
       }
@@ -3353,7 +3367,7 @@ int input_default_params(
 
   /** - primordial structure */
 
-  ppm->use_Beltran_params = _FALSE_; /* GFA */
+  ppm->use_Beltran_cdi  = _FALSE_; /* GFA */
   ppm->primordial_spec_type = analytic_Pk;
   ppm->k_pivot = 0.05;
   ppm->A_s = 2.215e-9;
