@@ -1055,8 +1055,6 @@ cdef class Class:
     def n_s(self):
         return self.pm.n_s
 
-#GFA
-
     def P_RR_1(self):
         return self.pm.P_RR_1
 
@@ -1778,7 +1776,6 @@ cdef class Class:
                 value = log(1.e10*self.pm.A_s)
             elif name == 'n_s':
                 value = self.pm.n_s
-#GFA
             elif name == 'P_RR_1':
                 value = self.pm.P_RR_1
             elif name == 'P_RR_2':

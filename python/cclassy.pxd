@@ -174,6 +174,12 @@ cdef extern from "class.h":
         double k_pivot
         double A_s
         double n_s
+        double P_RR_1
+        double P_RR_2
+        double P_II_1
+        double P_II_2
+        double P_RI_1
+        double P_RI_2
         double alpha_s
         double beta_s
         double r
