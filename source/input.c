@@ -1908,6 +1908,7 @@ int input_read_parameters(
     }
     else {
      ppm->use_Beltran_cdi   = _FALSE_;
+     ppt->has_cdi = _TRUE_;
     }
   }
 
