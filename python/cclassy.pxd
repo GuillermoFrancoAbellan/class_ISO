@@ -178,6 +178,8 @@ cdef extern from "class.h":
         double P_RR_2
         double P_II_1
         double P_II_2
+        double alpha_k1
+        double alpha_k2
         double P_RI_1
         double P_RI_2
         double alpha_s

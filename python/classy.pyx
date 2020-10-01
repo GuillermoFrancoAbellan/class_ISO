@@ -1067,6 +1067,12 @@ cdef class Class:
     def P_II_2(self):
         return self.pm.P_II_2
 
+    def alpha_k1(self):
+        return self.pm.alpha_k1
+
+    def alpha_k2(self):
+        return self.pm.alpha_k2
+
     def P_RI_1(self):
         return self.pm.P_RI_1
 
@@ -1784,6 +1790,10 @@ cdef class Class:
                 value = self.pm.P_II_1
             elif name == 'P_II_2':
                 value = self.pm.P_II_2
+            elif name == 'alpha_k1':
+                value = self.pm.alpha_k1
+            elif name == 'alpha_k2':
+                value = self.pm.alpha_k2
             elif name == 'P_RI_1':
                 value = self.pm.P_RI_1
             elif name == 'P_RI_2':
