@@ -107,12 +107,31 @@ struct primordial {
   double n_cdi;  /**< CDI tilt */
   double alpha_cdi; /**< CDI running */
 
-  double P_RR_1; /* GFA: adiabatic power spectrum at k1=0.002 Mpc^{-1}, for comparison with Planck 2018 */
-  double P_RR_2;  /* GFA: adiabatic power spectrum at k2=0.1 Mpc^{-1}, for comparison with Planck 2018 */
-  double P_II_1; /* GFA: isocurvature power spectrum at k1=0.002 Mpc^{-1}, for comparison with Planck 2018 */
-  double P_II_2;  /* GFA: isocurvature power spectrum at k2=0.1 Mpc^{-1}, for comparison with Planck 2018 */
-  double P_RI_1;  /* GFA: correlation power spectrum at k1=0.002 Mpc^{-1}, for comparison with Planck 2018 */
-  double P_RI_2;  /* GFA: correlation power spectrum at k2=0.1 Mpc^{-1}, for comparison with Planck 2018 */
+  /* GFA: Parameters from Beltran parameterisation  */
+  double A_glob; // defined as A_s*(1+f_cdi^2) --> MAYBE ADD ALSO PARAMETER log(10^10 A_glob)
+  double alpha_iso; // defined as f_cdi^2/(1+f_cdi^2) (NOTE: f_cdi IS CALLED f_iso IN arXiv:0509209)
+  double ellipse_corr; // defined as 2*c_ad_cdi*sqrt(alpha_iso*(1-alpha_iso))
+                      // its name comes from the fact that the full parameter space of (alpha_iso,  ellipse_corr)
+                      // is contained within a ellipse
+
+  // NOTE: DONT MIX THIS alpha_iso WITH alpha_cdi DEFINED ABOVE, THE LAST ONE GIVES THE RUNNING
+  // DONT MIX EITHER WITH alpha_k1 AND alpha_k2 DEFINED BELOW
+
+  double P_RR_1; /* GFA: adiabatic power spectrum at scale k1, for comparison with Planck 2018 */
+  double P_RR_2;  /* GFA: adiabatic power spectrum at scale k2, for comparison with Planck 2018 */
+  double P_II_1; /* GFA: isocurvature power spectrum at scale k1, for comparison with Planck 2018 */
+  double P_II_2;  /* GFA: isocurvature power spectrum at scale k2, for comparison with Planck 2018 */
+  double alpha_k1; /* GFA: ratio P_II_1/P_RR_1 */
+  double alpha_k2; /* GFA: ratio P_II_2/P_RR_2 */
+  // ADD PARAMETERS BELOW 
+//  double beta_iso_low; /* GFA: ratio P_II/(P_II+P_RR) evaluated at a small scale  */
+//  double beta_iso_mid; /* GFA: ratio P_II/(P_II+P_RR) evaluated at a intemediate (pivot) scale  */
+//  double beta_iso_high; /* GFA: ratio P_II/(P_II+P_RR) evaluated at a big scale  */
+// NOTE: DONT MIX THIS beta_iso WITH THE beta DEFINED IN FORMULA 6 OF arXiv:0509209, THE LAST ONE GIVES THE CROSS-CORRELATION c_ad_cdi
+// beta_iso IS IN GENERAL K-DEPENDENT, BUT IN THE PARTICULAR CASE n_cdi = n_ad, THEN IT IS k-INDEPENDENT AND EQUAL TO THE alpha_iso DEFINED ABOVE
+
+  double P_RI_1;  /* GFA: correlation power spectrum at scale k1, for comparison with Planck 2018 */
+  double P_RI_2;  /* GFA: correlation power spectrum at scale k2, for comparison with Planck 2018 */
 
   double f_nid;  /**< neutrino density isocurvature (NID) entropy-to-curvature ratio \f$ S_{nid}/R \f$*/
   double n_nid;  /**< NID tilt */
