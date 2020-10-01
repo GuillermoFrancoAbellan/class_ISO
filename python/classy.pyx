@@ -1067,11 +1067,29 @@ cdef class Class:
     def P_II_2(self):
         return self.pm.P_II_2
 
+    def beta_iso_low(self):
+        return self.pm.beta_iso_low
+
+    def beta_iso_mid(self):
+        return self.pm.beta_iso_mid
+
+    def beta_iso_high(self):
+        return self.pm.beta_iso_high
+
     def alpha_k1(self):
         return self.pm.alpha_k1
 
     def alpha_k2(self):
         return self.pm.alpha_k2
+
+    def A_glob(self):
+        return self.pm.A_glob
+
+    def alpha_iso(self):
+        return self.pm.alpha_iso
+
+    def ellipse_corr(self):
+        return self.pm.ellipse_corr
 
     def P_RI_1(self):
         return self.pm.P_RI_1
@@ -1790,10 +1808,22 @@ cdef class Class:
                 value = self.pm.P_II_1
             elif name == 'P_II_2':
                 value = self.pm.P_II_2
+            elif name == 'beta_iso_low':
+                value = self.pm.beta_iso_low
+            elif name == 'beta_iso_mid':
+                value = self.pm.beta_iso_mid
+            elif name == 'beta_iso_high':
+                value = self.pm.beta_iso_high
             elif name == 'alpha_k1':
                 value = self.pm.alpha_k1
             elif name == 'alpha_k2':
                 value = self.pm.alpha_k2
+            elif name == 'A_glob':
+                value = self.pm.A_glob
+            elif name == 'alpha_iso':
+                value = self.pm.alpha_iso
+            elif name == 'ellipse_corr':
+                value = self.pm.ellipse_corr
             elif name == 'P_RI_1':
                 value = self.pm.P_RI_1
             elif name == 'P_RI_2':

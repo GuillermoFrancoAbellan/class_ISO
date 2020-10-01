@@ -123,12 +123,12 @@ struct primordial {
   double P_II_2;  /* GFA: isocurvature power spectrum at scale k2, for comparison with Planck 2018 */
   double alpha_k1; /* GFA: ratio P_II_1/P_RR_1 */
   double alpha_k2; /* GFA: ratio P_II_2/P_RR_2 */
-  // ADD PARAMETERS BELOW 
-//  double beta_iso_low; /* GFA: ratio P_II/(P_II+P_RR) evaluated at a small scale  */
-//  double beta_iso_mid; /* GFA: ratio P_II/(P_II+P_RR) evaluated at a intemediate (pivot) scale  */
-//  double beta_iso_high; /* GFA: ratio P_II/(P_II+P_RR) evaluated at a big scale  */
+  double beta_iso_low; /* GFA: ratio P_II/(P_II+P_RR) evaluated at a small scale  */
+  double beta_iso_mid; /* GFA: ratio P_II/(P_II+P_RR) evaluated at a intemediate (pivot) scale  */
+  double beta_iso_high; /* GFA: ratio P_II/(P_II+P_RR) evaluated at a big scale  */
 // NOTE: DONT MIX THIS beta_iso WITH THE beta DEFINED IN FORMULA 6 OF arXiv:0509209, THE LAST ONE GIVES THE CROSS-CORRELATION c_ad_cdi
-// beta_iso IS IN GENERAL K-DEPENDENT, BUT IN THE PARTICULAR CASE n_cdi = n_ad, THEN IT IS k-INDEPENDENT AND EQUAL TO THE alpha_iso DEFINED ABOVE
+// beta_iso IS IN GENERAL K-DEPENDENT, BUT IN THE PARTICULAR CASE n_cdi = n_ad OR k=k_pivot,
+// THEN IT IS k-INDEPENDENT AND EQUAL TO THE alpha_iso DEFINED ABOVE
 
   double P_RI_1;  /* GFA: correlation power spectrum at scale k1, for comparison with Planck 2018 */
   double P_RI_2;  /* GFA: correlation power spectrum at scale k2, for comparison with Planck 2018 */

@@ -180,6 +180,9 @@ cdef extern from "class.h":
         double P_II_2
         double alpha_k1
         double alpha_k2
+        double beta_iso_low
+        double beta_iso_mid
+        double beta_iso_high
         double P_RI_1
         double P_RI_2
         double alpha_s
@@ -196,6 +199,9 @@ cdef extern from "class.h":
         double n_cdi
         double c_ad_cdi
         double n_ad_cdi
+        double A_glob
+        double alpha_iso
+        double ellipse_corr
         double f_nid
         double n_nid
         double c_ad_nid

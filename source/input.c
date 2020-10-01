@@ -1975,6 +1975,7 @@ int input_read_parameters(
                pii2 = ppm->alpha_k2*ppm->P_RR_2;
                ppm->P_II_2 = pii2;
 
+
         class_read_double("P_{RI}^1",pri1);
         class_read_double("|P_{RI}^2|",pri2);
 
@@ -2062,7 +2063,45 @@ int input_read_parameters(
         ppm->A_glob = ppm->A_s*(1.+pow(ppm->f_cdi,2));
         ppm->alpha_iso = pow(ppm->f_cdi,2)/(1.+pow(ppm->f_cdi,2));
         ppm->ellipse_corr = 2.*ppm->c_ad_cdi*sqrt(ppm->alpha_iso*(1.-ppm->alpha_iso));
-       // MAKE SURE TO PRINT EVERYTHING AT THE END, AND TO MODIFY THE PYTHON WRAPPER
+
+        /*  compute all the beta's  */
+        if (k1 <= k2) {
+          if ((k1 != ppm->k_pivot) && (k2 != ppm->k_pivot)) {
+            ppm->beta_iso_low = ppm->P_II_1/(ppm->P_II_1+ppm->P_RR_1);
+            ppm->beta_iso_high = ppm->P_II_2/(ppm->P_II_2+ppm->P_RR_2);
+            ppm->beta_iso_mid = pow(ppm->f_cdi,2)/(1.+pow(ppm->f_cdi,2));
+          } else {
+            if (k1 == ppm->k_pivot){
+             ppm->beta_iso_low = ppm->P_II_1/(ppm->P_II_1+ppm->P_RR_1);
+             ppm->beta_iso_high = ppm->P_II_2/(ppm->P_II_2+ppm->P_RR_2);
+             ppm->beta_iso_mid = ppm->beta_iso_low;
+            }
+            if (k2 == ppm->k_pivot){
+              ppm->beta_iso_low = ppm->P_II_1/(ppm->P_II_1+ppm->P_RR_1);
+              ppm->beta_iso_high = ppm->P_II_2/(ppm->P_II_2+ppm->P_RR_2);
+              ppm->beta_iso_mid = ppm->beta_iso_high;
+            }
+          }
+        } else {
+          if ((k1 != ppm->k_pivot) && (k2 != ppm->k_pivot)) {
+            ppm->beta_iso_high = ppm->P_II_1/(ppm->P_II_1+ppm->P_RR_1);
+            ppm->beta_iso_low = ppm->P_II_2/(ppm->P_II_2+ppm->P_RR_2);
+            ppm->beta_iso_mid = pow(ppm->f_cdi,2)/(1.+pow(ppm->f_cdi,2));
+          } else {
+            if (k1 == ppm->k_pivot){
+             ppm->beta_iso_high = ppm->P_II_1/(ppm->P_II_1+ppm->P_RR_1);
+             ppm->beta_iso_low = ppm->P_II_2/(ppm->P_II_2+ppm->P_RR_2);
+             ppm->beta_iso_mid = ppm->beta_iso_high;
+            }
+            if (k2 == ppm->k_pivot){
+              ppm->beta_iso_high = ppm->P_II_1/(ppm->P_II_1+ppm->P_RR_1);
+              ppm->beta_iso_low = ppm->P_II_2/(ppm->P_II_2+ppm->P_RR_2);
+              ppm->beta_iso_mid = ppm->beta_iso_low;
+            }
+          }
+        }
+
+
       }
 
       if (ppt->has_nid == _TRUE_) {
@@ -2155,6 +2194,44 @@ int input_read_parameters(
 
         ppm->alpha_k1 = ppm->P_II_1/ppm->P_RR_1;
         ppm->alpha_k2 = ppm->P_II_2/ppm->P_RR_2;
+
+        /*  compute all the beta's  */
+        if (k1 <= k2) {
+          if ((k1 != ppm->k_pivot) && (k2 != ppm->k_pivot)) {
+            ppm->beta_iso_low = ppm->P_II_1/(ppm->P_II_1+ppm->P_RR_1);
+            ppm->beta_iso_high = ppm->P_II_2/(ppm->P_II_2+ppm->P_RR_2);
+            ppm->beta_iso_mid = pow(ppm->f_cdi,2)/(1.+pow(ppm->f_cdi,2));
+          } else {
+            if (k1 == ppm->k_pivot){
+             ppm->beta_iso_low = ppm->P_II_1/(ppm->P_II_1+ppm->P_RR_1);
+             ppm->beta_iso_high = ppm->P_II_2/(ppm->P_II_2+ppm->P_RR_2);
+             ppm->beta_iso_mid = ppm->beta_iso_low;
+            }
+            if (k2 == ppm->k_pivot){
+              ppm->beta_iso_low = ppm->P_II_1/(ppm->P_II_1+ppm->P_RR_1);
+              ppm->beta_iso_high = ppm->P_II_2/(ppm->P_II_2+ppm->P_RR_2);
+              ppm->beta_iso_mid = ppm->beta_iso_high;
+            }
+          }
+        } else {
+          if ((k1 != ppm->k_pivot) && (k2 != ppm->k_pivot)) {
+            ppm->beta_iso_high = ppm->P_II_1/(ppm->P_II_1+ppm->P_RR_1);
+            ppm->beta_iso_low = ppm->P_II_2/(ppm->P_II_2+ppm->P_RR_2);
+            ppm->beta_iso_mid = pow(ppm->f_cdi,2)/(1.+pow(ppm->f_cdi,2));
+          } else {
+            if (k1 == ppm->k_pivot){
+             ppm->beta_iso_high = ppm->P_II_1/(ppm->P_II_1+ppm->P_RR_1);
+             ppm->beta_iso_low = ppm->P_II_2/(ppm->P_II_2+ppm->P_RR_2);
+             ppm->beta_iso_mid = ppm->beta_iso_high;
+            }
+            if (k2 == ppm->k_pivot){
+              ppm->beta_iso_high = ppm->P_II_1/(ppm->P_II_1+ppm->P_RR_1);
+              ppm->beta_iso_low = ppm->P_II_2/(ppm->P_II_2+ppm->P_RR_2);
+              ppm->beta_iso_mid = ppm->beta_iso_low;
+            }
+          }
+        }
+        
 
       }
 
