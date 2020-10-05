@@ -2280,12 +2280,13 @@ int input_read_parameters(
 	     if (ppm->use_Beltran_cdi == _FALSE_){
          class_read_double_one_of_two("c_ad_cdi","c_cdi_ad",ppm->c_ad_cdi);
          class_read_double_one_of_two("n_ad_cdi","n_cdi_ad",ppm->n_ad_cdi);
-         class_test(((ppm->n_ad_cdi != 0.) && ((ppm->c_ad_cdi == 0. ) || (ppm->c_ad_cdi ==-1.) || (ppm->c_ad_cdi ==+1.))),
-                    errmsg,
-                    "If c_ad_cdi is one of 0, -1, +1, then n_ad_cdi has to be zero"); /* GFA */
          class_read_double_one_of_two("alpha_ad_cdi","alpha_cdi_ad",ppm->alpha_ad_cdi);
          ppm->ellipse_corr = 2.*ppm->c_ad_cdi*sqrt(ppm->alpha_iso*(1.-ppm->alpha_iso));
-         ppm->delta_corr = -ppm->n_ad_cdi/log(fabs(ppm->c_ad_cdi)); //will be equal to 0 when ppm->n_ad_cdi=0, i.e. when ppm->c_ad_cdi is 0, -1 or +1
+         if ((ppm->c_ad_cdi == 0. ) || (ppm->c_ad_cdi ==-1.) || (ppm->c_ad_cdi ==+1.)) { /* GFA */
+           ppm->delta_corr = 0.;
+         } else {
+           ppm->delta_corr = -ppm->n_ad_cdi/log(fabs(ppm->c_ad_cdi));
+         }
          class_test(((ppm->delta_corr >  0.27) || (ppm->delta_corr  < -0.14)),
                     errmsg,
                     "For the given c_ad_cdi, n_ad_cdi needs to be smaller, otherwise there's too much power over the relevant scales"); /* GFA */
@@ -2294,13 +2295,17 @@ int input_read_parameters(
          class_read_double("delta_corr",ppm->delta_corr);        /* GFA  */
          class_read_double_one_of_two("alpha_ad_cdi","alpha_cdi_ad",ppm->alpha_ad_cdi);
 	       ppm->c_ad_cdi = 0.5*ppm->ellipse_corr/sqrt(ppm->alpha_iso*(1.-ppm->alpha_iso));
-         class_test(((ppm->delta_corr != 0.) && ((ppm->c_ad_cdi == 0. ) || (ppm->c_ad_cdi ==-1.) || (ppm->c_ad_cdi ==+1.))),
-                    errmsg,
-                    "If c_ad_cdi is one of 0, -1, +1, then delta_corr has to be zero"); /* GFA */
          class_test(((ppm->delta_corr >  0.27) || (ppm->delta_corr  < -0.14)),
                     errmsg,
                       "delta_corr needs to be bounded between -0.14 and 0.27, otherwise there's too much power over the relevant scales"); /* GFA */
-         ppm->n_ad_cdi = -ppm->delta_corr*log(fabs(ppm->c_ad_cdi));
+
+         if ((ppm->c_ad_cdi == 0. ) || (ppm->c_ad_cdi ==-1.) || (ppm->c_ad_cdi ==+1.)) { /* GFA */
+           ppm->n_ad_cdi = 0.;
+         } else {
+           ppm->n_ad_cdi = -ppm->delta_corr*log(fabs(ppm->c_ad_cdi));
+         }
+
+
        }
        /* GFA: these quantities are being computed  only when we have some cdi isocurvature,
         for both Beltran parametrization and the standard CLASS parametrization */
