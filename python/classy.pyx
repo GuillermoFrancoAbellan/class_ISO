@@ -1798,6 +1798,8 @@ cdef class Class:
                 value = self.pm.A_s
             elif name == 'ln10^{10}A_s':
                 value = log(1.e10*self.pm.A_s)
+            elif name == 'ln10^{10}A_glob':
+                value = log(1.e10*self.pm.A_glob)
             elif name == 'n_s':
                 value = self.pm.n_s
             elif name == 'P_RR_1':

@@ -1912,7 +1912,8 @@ int input_read_parameters(
 
 
   if (ppm->primordial_spec_type == two_scales) {
-
+    k1 = 0.002; // default value if we dont pass any k1
+    k2 = 0.1;   // default value if we dont pass any k2
     class_read_double("k1",k1);
     class_read_double("k2",k2);
     class_test(k1<=0.,errmsg,"enter strictly positive scale k1");
@@ -2173,11 +2174,27 @@ int input_read_parameters(
       if (ppt->has_cdi == _TRUE_) {
         if (ppm->use_Beltran_cdi == _FALSE_) { /* GFA */
          class_read_double("f_cdi",ppm->f_cdi);
+         ppm->alpha_iso = pow(ppm->f_cdi,2)/(1.0+pow(ppm->f_cdi,2));
+         ppm->A_glob = ppm->A_s*(1.0+pow(ppm->f_cdi,2));
         }
       	else {
          class_read_double("alpha_iso",ppm->alpha_iso);
-         class_read_double("A_glob",ppm->A_glob);
          ppm->f_cdi = sqrt(ppm->alpha_iso/(1.-ppm->alpha_iso));
+
+         class_call(parser_read_double(pfc,"A_glob",&param1,&flag1,errmsg),
+                    errmsg,
+                    errmsg);
+         class_call(parser_read_double(pfc,"ln10^{10}A_glob",&param2,&flag2,errmsg),
+                    errmsg,
+                    errmsg);
+         class_test((flag1 == _TRUE_) && (flag2 == _TRUE_),
+                    errmsg,
+                    "In input file, you cannot enter both A_glob and ln10^{10}A_glob, choose one");
+         if (flag1 == _TRUE_)
+           ppm->A_glob = param1;
+         else if (flag2 == _TRUE_)
+           ppm->A_glob = exp(param2)*1.e-10;
+
          ppm->A_s = ppm->A_glob/(1.+pow(ppm->f_cdi,2));
         }
 
@@ -2231,7 +2248,7 @@ int input_read_parameters(
             }
           }
         }
-        
+
 
       }
 
@@ -2262,6 +2279,7 @@ int input_read_parameters(
          class_read_double_one_of_two("c_ad_cdi","c_cdi_ad",ppm->c_ad_cdi);
          class_read_double_one_of_two("n_ad_cdi","n_cdi_ad",ppm->n_ad_cdi);
          class_read_double_one_of_two("alpha_ad_cdi","alpha_cdi_ad",ppm->alpha_ad_cdi);
+         ppm->ellipse_corr = 2.*ppm->c_ad_cdi*sqrt(ppm->alpha_iso*(1.-ppm->alpha_iso));
 	     } else {
 	       class_read_double("ellipse_corr",ppm->ellipse_corr);
          class_read_double_one_of_two("n_ad_cdi","n_cdi_ad",ppm->n_ad_cdi);
@@ -2609,6 +2627,28 @@ int input_read_parameters(
     class_test(ppt->has_bi == _TRUE_ || ppt->has_cdi == _TRUE_ || ppt->has_nid == _TRUE_ || ppt->has_niv == _TRUE_,
                errmsg,
                "inflationary module cannot work if you ask for isocurvature modes");
+  }
+
+
+
+  /* GFA: print all relevant parameters when ad+cdi initial conditions are considered  */
+  if (input_verbose > 0) {
+    if (ppt->has_cdi == _TRUE_) {
+      if ((ppm->primordial_spec_type == two_scales ) || (ppm->primordial_spec_type == analytic_Pk)) {
+
+        printf(" -> The adiabatic amplitude and tilt are A_s =%e and n_s=%e \n",ppm->A_s,ppm->n_s);
+        printf(" -> The cosinus of the cross-correlation angle is c_ad_cdi =%e \n",ppm->c_ad_cdi);
+        printf(" -> adiabatic primordial amplitude at k1= %.3f Mpc^-1 and k2 =%.3f Mpc^-1 are respectively P_RR_1=%e and P_RR_2 =%e \n",k1,k2,ppm->P_RR_1,ppm->P_RR_2);
+        printf(" -> isocurvature primordial amplitude at k1= %.3f Mpc^-1 and k2 =%.3f Mpc^-1 are respectively P_II_1=%e and P_II_2 =%e \n",k1,k2,ppm->P_II_1,ppm->P_II_2);
+        printf(" -> the ratios between both amplitudes at each scale are alpha_k1 = %e and alpha_k2 =%e \n",ppm->alpha_k1,ppm->alpha_k2);
+        printf(" -> and the relative fractions at small, pivot and high scales are beta_low =%e, beta_mid =%e and beta_high =%e \n",ppm->beta_iso_low,ppm->beta_iso_mid,ppm->beta_iso_high);
+        printf(" -> cross-correlation primordial amplitude at k1= %.3f Mpc^-1 and k2 =%.3f Mpc^-1 are respectively P_RI_1=%e and P_RI_2 =%e \n",k1,k2,ppm->P_RI_1,ppm->P_RI_2);
+        printf(" -> in terms of Beltran parametrization, we have n_iso=%e, A_glob =%e \n",ppm->n_cdi,ppm->A_glob);
+        printf(" -> alpha_iso=%e, ellipse_corr = %e \n",ppm->alpha_iso,ppm->ellipse_corr);
+
+
+      }
+    }
   }
 
   /** (e) parameters for final spectra */

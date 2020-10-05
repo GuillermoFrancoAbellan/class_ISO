@@ -104,15 +104,15 @@ struct primordial {
   double alpha_bi; /**< BI running */
 
   double f_cdi;  /**< CDM isocurvature (CDI) entropy-to-curvature ratio \f$ S_{cdi}/R \f$*/
-  double n_cdi;  /**< CDI tilt */
+  double n_cdi;  /**< CDI tilt */  // (NOTE: n_cdi IS CALLED n_iso IN arXiv:0509209)
   double alpha_cdi; /**< CDI running */
 
   /* GFA: Parameters from Beltran parameterisation  */
-  double A_glob; // defined as A_s*(1+f_cdi^2) --> MAYBE ADD ALSO PARAMETER log(10^10 A_glob)
+  double A_glob; // defined as A_s*(1+f_cdi^2)
   double alpha_iso; // defined as f_cdi^2/(1+f_cdi^2) (NOTE: f_cdi IS CALLED f_iso IN arXiv:0509209)
   double ellipse_corr; // defined as 2*c_ad_cdi*sqrt(alpha_iso*(1-alpha_iso))
                       // its name comes from the fact that the full parameter space of (alpha_iso,  ellipse_corr)
-                      // is contained within a ellipse
+                      // is contained within a ellipse ---> I STILL HAVE TO ADD PARAMETER delta_corr, RELATED TO CORRELATION INDEX
 
   // NOTE: DONT MIX THIS alpha_iso WITH alpha_cdi DEFINED ABOVE, THE LAST ONE GIVES THE RUNNING
   // DONT MIX EITHER WITH alpha_k1 AND alpha_k2 DEFINED BELOW
