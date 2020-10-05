@@ -202,6 +202,7 @@ cdef extern from "class.h":
         double A_glob
         double alpha_iso
         double ellipse_corr
+        double delta_corr
         double f_nid
         double n_nid
         double c_ad_nid

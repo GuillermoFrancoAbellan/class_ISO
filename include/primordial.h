@@ -112,7 +112,9 @@ struct primordial {
   double alpha_iso; // defined as f_cdi^2/(1+f_cdi^2) (NOTE: f_cdi IS CALLED f_iso IN arXiv:0509209)
   double ellipse_corr; // defined as 2*c_ad_cdi*sqrt(alpha_iso*(1-alpha_iso))
                       // its name comes from the fact that the full parameter space of (alpha_iso,  ellipse_corr)
-                      // is contained within a ellipse ---> I STILL HAVE TO ADD PARAMETER delta_corr, RELATED TO CORRELATION INDEX
+                      // is contained within a ellipse
+  double delta_corr; // defined as -n_cdi_ad/log(abs(c_ad_cdi)), only makes sense when c_ad_cdi is different from 0, -1 and +1
+                     // it has to be bounded between -0.14 and 0.27, see eq. 13 of arXiv:0509209
 
   // NOTE: DONT MIX THIS alpha_iso WITH alpha_cdi DEFINED ABOVE, THE LAST ONE GIVES THE RUNNING
   // DONT MIX EITHER WITH alpha_k1 AND alpha_k2 DEFINED BELOW

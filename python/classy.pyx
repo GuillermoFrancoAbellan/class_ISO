@@ -1091,6 +1091,9 @@ cdef class Class:
     def ellipse_corr(self):
         return self.pm.ellipse_corr
 
+    def delta_corr(self):
+        return self.pm.delta_corr
+
     def P_RI_1(self):
         return self.pm.P_RI_1
 
@@ -1826,6 +1829,8 @@ cdef class Class:
                 value = self.pm.alpha_iso
             elif name == 'ellipse_corr':
                 value = self.pm.ellipse_corr
+            elif name == 'delta_corr':
+                value = self.pm.delta_corr
             elif name == 'P_RI_1':
                 value = self.pm.P_RI_1
             elif name == 'P_RI_2':

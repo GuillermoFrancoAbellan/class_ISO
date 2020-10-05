@@ -2064,6 +2064,8 @@ int input_read_parameters(
         ppm->A_glob = ppm->A_s*(1.+pow(ppm->f_cdi,2));
         ppm->alpha_iso = pow(ppm->f_cdi,2)/(1.+pow(ppm->f_cdi,2));
         ppm->ellipse_corr = 2.*ppm->c_ad_cdi*sqrt(ppm->alpha_iso*(1.-ppm->alpha_iso));
+        ppm->delta_corr = -ppm->n_ad_cdi/log(fabs(ppm->c_ad_cdi)); //will be equal to 0 when ppm->n_ad_cdi=0, i.e. when ppm->c_ad_cdi is 0, -1 or +1
+                                                                   // for rest of cases, it should be bounded between -0.14 and 0.27
 
         /*  compute all the beta's  */
         if (k1 <= k2) {
@@ -2278,18 +2280,32 @@ int input_read_parameters(
 	     if (ppm->use_Beltran_cdi == _FALSE_){
          class_read_double_one_of_two("c_ad_cdi","c_cdi_ad",ppm->c_ad_cdi);
          class_read_double_one_of_two("n_ad_cdi","n_cdi_ad",ppm->n_ad_cdi);
+         class_test(((ppm->n_ad_cdi != 0.) && ((ppm->c_ad_cdi == 0. ) || (ppm->c_ad_cdi ==-1.) || (ppm->c_ad_cdi ==+1.))),
+                    errmsg,
+                    "If c_ad_cdi is one of 0, -1, +1, then n_ad_cdi has to be zero"); /* GFA */
          class_read_double_one_of_two("alpha_ad_cdi","alpha_cdi_ad",ppm->alpha_ad_cdi);
          ppm->ellipse_corr = 2.*ppm->c_ad_cdi*sqrt(ppm->alpha_iso*(1.-ppm->alpha_iso));
+         ppm->delta_corr = -ppm->n_ad_cdi/log(fabs(ppm->c_ad_cdi)); //will be equal to 0 when ppm->n_ad_cdi=0, i.e. when ppm->c_ad_cdi is 0, -1 or +1
+         class_test(((ppm->delta_corr >  0.27) || (ppm->delta_corr  < -0.14)),
+                    errmsg,
+                    "For the given c_ad_cdi, n_ad_cdi needs to be smaller, otherwise there's too much power over the relevant scales"); /* GFA */
 	     } else {
 	       class_read_double("ellipse_corr",ppm->ellipse_corr);
-         class_read_double_one_of_two("n_ad_cdi","n_cdi_ad",ppm->n_ad_cdi);
+         class_read_double("delta_corr",ppm->delta_corr);        /* GFA  */
          class_read_double_one_of_two("alpha_ad_cdi","alpha_cdi_ad",ppm->alpha_ad_cdi);
 	       ppm->c_ad_cdi = 0.5*ppm->ellipse_corr/sqrt(ppm->alpha_iso*(1.-ppm->alpha_iso));
+         class_test(((ppm->delta_corr != 0.) && ((ppm->c_ad_cdi == 0. ) || (ppm->c_ad_cdi ==-1.) || (ppm->c_ad_cdi ==+1.))),
+                    errmsg,
+                    "If c_ad_cdi is one of 0, -1, +1, then delta_corr has to be zero"); /* GFA */
+         class_test(((ppm->delta_corr >  0.27) || (ppm->delta_corr  < -0.14)),
+                    errmsg,
+                      "delta_corr needs to be bounded between -0.14 and 0.27, otherwise there's too much power over the relevant scales"); /* GFA */
+         ppm->n_ad_cdi = -ppm->delta_corr*log(fabs(ppm->c_ad_cdi));
        }
        /* GFA: these quantities are being computed  only when we have some cdi isocurvature,
         for both Beltran parametrization and the standard CLASS parametrization */
-        ppm->P_RI_1  = ppm->A_s*ppm->f_cdi*ppm->c_ad_cdi*exp((ppm->n_ad_cdi+0.5*(ppm->n_s+ppm->n_cdi-2.))*log(k1/ppm->k_pivot));
-        ppm->P_RI_2  = ppm->A_s*ppm->f_cdi*ppm->c_ad_cdi*exp((ppm->n_ad_cdi+0.5*(ppm->n_s+ppm->n_cdi-2.))*log(k2/ppm->k_pivot));
+        ppm->P_RI_1  = -ppm->A_s*ppm->f_cdi*ppm->c_ad_cdi*exp((ppm->n_ad_cdi+0.5*(ppm->n_s+ppm->n_cdi-2.))*log(k1/ppm->k_pivot)); /* GFA: not sure about the - sign */
+        ppm->P_RI_2  = -ppm->A_s*ppm->f_cdi*ppm->c_ad_cdi*exp((ppm->n_ad_cdi+0.5*(ppm->n_s+ppm->n_cdi-2.))*log(k2/ppm->k_pivot)); /* GFA: not sure about the  - sign */
       }
 
       if ((ppt->has_ad == _TRUE_) && (ppt->has_nid == _TRUE_)) {
@@ -2636,16 +2652,17 @@ int input_read_parameters(
     if (ppt->has_cdi == _TRUE_) {
       if ((ppm->primordial_spec_type == two_scales ) || (ppm->primordial_spec_type == analytic_Pk)) {
 
-        printf(" -> The adiabatic amplitude and tilt are A_s =%e and n_s=%e \n",ppm->A_s,ppm->n_s);
-        printf(" -> The cosinus of the cross-correlation angle is c_ad_cdi =%e \n",ppm->c_ad_cdi);
-        printf(" -> adiabatic primordial amplitude at k1= %.3f Mpc^-1 and k2 =%.3f Mpc^-1 are respectively P_RR_1=%e and P_RR_2 =%e \n",k1,k2,ppm->P_RR_1,ppm->P_RR_2);
-        printf(" -> isocurvature primordial amplitude at k1= %.3f Mpc^-1 and k2 =%.3f Mpc^-1 are respectively P_II_1=%e and P_II_2 =%e \n",k1,k2,ppm->P_II_1,ppm->P_II_2);
-        printf(" -> the ratios between both amplitudes at each scale are alpha_k1 = %e and alpha_k2 =%e \n",ppm->alpha_k1,ppm->alpha_k2);
-        printf(" -> and the relative fractions at small, pivot and high scales are beta_low =%e, beta_mid =%e and beta_high =%e \n",ppm->beta_iso_low,ppm->beta_iso_mid,ppm->beta_iso_high);
-        printf(" -> cross-correlation primordial amplitude at k1= %.3f Mpc^-1 and k2 =%.3f Mpc^-1 are respectively P_RI_1=%e and P_RI_2 =%e \n",k1,k2,ppm->P_RI_1,ppm->P_RI_2);
-        printf(" -> in terms of Beltran parametrization, we have n_iso=%e, A_glob =%e \n",ppm->n_cdi,ppm->A_glob);
-        printf(" -> alpha_iso=%e, ellipse_corr = %e \n",ppm->alpha_iso,ppm->ellipse_corr);
-
+        printf(" -> 1) ANALYTIC SPECTRUM: CLASS PARAMETRIZATION \n");
+        printf(" ->  A_s =%e, f_iso = %e, n_s=%e, n_iso=%e  \n",ppm->A_s, ppm->f_cdi, ppm->n_s,ppm->n_cdi);
+        printf(" ->  c_ad_cdi =%e, n_ad_cdi=%e \n",ppm->c_ad_cdi,ppm->n_ad_cdi);
+        printf(" -> 2) ANALYTIC SPECTRUM: BELTRAN PARAMETRIZATION \n");
+        printf(" -> A_glob =%e, alpha_iso=%e, n_s=%e, n_iso=%e, \n",ppm->A_glob,ppm->alpha_iso,ppm->n_s,ppm->n_cdi);
+        printf(" -> ellipse_corr = %e, delta_corr =%e  \n",ppm->ellipse_corr, ppm->delta_corr);
+        printf(" -> 2) TWO-SCALE SPECTRUM AT k1= %.3f Mpc^-1 AND k2 =%.3f Mpc^-1\n", k1, k2);
+        printf(" -> P_RR_1=%e and P_RR_2 =%e \n",ppm->P_RR_1,ppm->P_RR_2);
+        printf(" -> P_II_1=%e (alpha_k1 = %e) and P_II_2 =%e (alpha_k2 =%e) \n",ppm->P_II_1,ppm->alpha_k1,ppm->P_II_2,ppm->alpha_k2);
+        printf(" -> beta_low =%e, beta_mid =%e and beta_high =%e \n",ppm->beta_iso_low,ppm->beta_iso_mid,ppm->beta_iso_high);
+        printf(" -> P_RI_1=%e and |P_RI_2| =%e \n",ppm->P_RI_1,fabs(ppm->P_RI_2));
 
       }
     }
@@ -3573,6 +3590,9 @@ int input_default_params(
   ppm->P_II_2 = ppm->A_s*pow(ppm->f_cdi,2)*exp((ppm->n_cdi-1.)*log(0.1/ppm->k_pivot)); /* GFA */
   ppm->alpha_k1 = ppm->P_II_1/ppm->P_RR_1; /* GFA */
   ppm->alpha_k2 = ppm->P_II_2/ppm->P_RR_2; /* GFA */
+  ppm->beta_iso_low = ppm->P_II_1/(ppm->P_RR_1+ppm->P_II_1); /* GFA */
+  ppm->beta_iso_high = ppm->P_II_2/(ppm->P_RR_2+ppm->P_II_2); /* GFA */
+  ppm->beta_iso_mid = ppm->alpha_iso; /* GFA */
   ppm->alpha_cdi = 0.;
   ppm->f_nid = 1.;
   ppm->n_nid = 1.;
@@ -3586,9 +3606,10 @@ int input_default_params(
   ppm->c_ad_cdi = 0.;
   ppm->ellipse_corr =0.; /* GFA */
   ppm->n_ad_cdi = 0.;
+  ppm->delta_corr = 0.; /* GFA */
   ppm->alpha_ad_cdi = 0.;
-  ppm->P_RI_1 = ppm->A_s*ppm->f_cdi*ppm->c_ad_cdi*exp((ppm->n_ad_cdi+0.5*(ppm->n_s+ppm->n_cdi-2.))*log(0.02/ppm->k_pivot)); /* GFA */
-  ppm->P_RI_2 = ppm->A_s*ppm->f_cdi*ppm->c_ad_cdi*exp((ppm->n_ad_cdi+0.5*(ppm->n_s+ppm->n_cdi-2.))*log(0.1/ppm->k_pivot));  /* GFA */
+  ppm->P_RI_1 = -ppm->A_s*ppm->f_cdi*ppm->c_ad_cdi*exp((ppm->n_ad_cdi+0.5*(ppm->n_s+ppm->n_cdi-2.))*log(0.02/ppm->k_pivot)); /* GFA: not sure about the - sign */
+  ppm->P_RI_2 = -ppm->A_s*ppm->f_cdi*ppm->c_ad_cdi*exp((ppm->n_ad_cdi+0.5*(ppm->n_s+ppm->n_cdi-2.))*log(0.1/ppm->k_pivot));  /* GFA: not sure about the - sign */
   ppm->c_ad_nid = 0.;
   ppm->n_ad_nid = 0.;
   ppm->alpha_ad_nid = 0.;
