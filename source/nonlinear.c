@@ -1214,6 +1214,9 @@ int nonlinear_init(
   double * pvecback;
   int last_index;
   double a,z;
+  double z_for_neff=3.; // GFA
+  double k_s_over_km = 0.009; // GFA
+  double k_for_neff, pk_tilt_for_neff; // GFA
 
   struct nonlinear_workspace nw;
   struct nonlinear_workspace * pnw;
@@ -1348,6 +1351,22 @@ int nonlinear_init(
                pnl->error_message);
   }
 
+  // GFA: Convert Ly-alpha scale from s/km to h/Mpc
+  k_for_neff = k_s_over_km*100.0*sqrt(pba->Omega0_m*pow(1.+z_for_neff,3.)+pba->Omega0_lambda)/(1.+z_for_neff);
+  // GFA: Compute the tilt of the matter power spectrum at the required redshift and scale
+  class_call(nonlinear_pk_tilt_at_k_and_z(pba,
+                                          ppm,
+                                          pnl,
+                                          pk_linear,
+                                          k_for_neff*pba->h,
+                                          z_for_neff,
+                                          pnl->index_pk_m,
+                                          &pk_tilt_for_neff),
+             pnl->error_message,
+             pnl->error_message);
+
+   ppm->neff = pk_tilt_for_neff;
+
   if (pnl->nonlinear_verbose>0) {
 
     if (pnl->has_pk_m == _TRUE_)
@@ -1359,6 +1378,9 @@ int nonlinear_init(
       fprintf(stdout," -> sigma8=%g for baryons+cdm  (computed till k = %g h/Mpc)\n",
               pnl->sigma8[pnl->index_pk_cb],
               pnl->k[pnl->k_size-1]/pba->h);
+
+      fprintf(stdout," -> Ly-alpha parameter n_eff=%g\n",ppm->neff); // GFA
+
   }
 
   /** - get the non-linear power spectrum at each time */

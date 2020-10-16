@@ -3581,6 +3581,7 @@ int input_default_params(
   ppm->k_pivot = 0.05;
   ppm->A_s = 2.215e-9;
   ppm->n_s = 0.9619;
+  ppm->neff = -2.3074; /* GFA */
   ppm->alpha_s = 0.;
   ppm->f_bi = 1.;
   ppm->n_bi = 1.;

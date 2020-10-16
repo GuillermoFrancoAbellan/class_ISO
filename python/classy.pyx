@@ -1055,6 +1055,9 @@ cdef class Class:
     def n_s(self):
         return self.pm.n_s
 
+    def neff(self):
+          return self.pm.neff
+
     def P_RR_1(self):
         return self.pm.P_RR_1
 
@@ -1808,6 +1811,8 @@ cdef class Class:
                 value = log(1.e10*self.pm.A_glob)
             elif name == 'n_s':
                 value = self.pm.n_s
+            elif name == 'neff':
+                value = self.pm.neff
             elif name == 'P_RR_1':
                 value = self.pm.P_RR_1
             elif name == 'P_RR_2':

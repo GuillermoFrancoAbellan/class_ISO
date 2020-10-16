@@ -92,6 +92,7 @@ struct primordial {
 
   double A_s;  /**< usual scalar amplitude = curvature power spectrum at pivot scale */
   double n_s;  /**< usual scalar tilt = [curvature power spectrum tilt at pivot scale -1] */
+  double neff; /* GFA: tilt of the matter spectrum today at a scale k= 0.009 s/km, relevant for Ly-alpha analysis */
   double alpha_s; /**< usual scalar running */
   double beta_s;  /**< running of running */
 
