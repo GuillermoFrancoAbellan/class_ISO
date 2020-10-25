@@ -2295,6 +2295,7 @@ int input_read_parameters(
          class_read_double("delta_corr",ppm->delta_corr);        /* GFA  */
          class_read_double_one_of_two("alpha_ad_cdi","alpha_cdi_ad",ppm->alpha_ad_cdi);
 	       ppm->c_ad_cdi = 0.5*ppm->ellipse_corr/sqrt(ppm->alpha_iso*(1.-ppm->alpha_iso));
+         // GFA: NOTE: SHOULD I ADD SOME ERROR MESSAGE IN CASE ppm->c_ad_cdi BECOMES BIGGER THAN 1 OR SMALLER THAN -1?
          class_test(((ppm->delta_corr >  0.27) || (ppm->delta_corr  < -0.14)),
                     errmsg,
                       "delta_corr needs to be bounded between -0.14 and 0.27, otherwise there's too much power over the relevant scales"); /* GFA */
