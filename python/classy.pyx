@@ -1091,6 +1091,12 @@ cdef class Class:
     def n_cdi(self):
         return self.pm.n_cdi
 
+    def f_cdi(self):
+            return self.pm.f_cdi
+
+    def c_ad_cdi(self):
+            return self.pm.c_ad_cdi
+
     def alpha_iso(self):
         return self.pm.alpha_iso
 
@@ -1835,6 +1841,10 @@ cdef class Class:
                 value = self.pm.A_glob
             elif name == 'n_cdi':
                 value = self.pm.n_cdi
+            elif name == 'f_cdi':
+                value = self.pm.f_cdi
+            elif name == 'c_ad_cdi':
+                value = self.pm.c_ad_cdi
             elif name == 'alpha_iso':
                 value = self.pm.alpha_iso
             elif name == 'ellipse_corr':
