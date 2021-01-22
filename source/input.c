@@ -2037,8 +2037,19 @@ int input_read_parameters(
             n_cor = log(pri2/fabs(pri1))/log(k2/k1)-0.5*(ppm->n_s+n_iso-2.);
           }
           class_test((pii1*prr1<=0.),errmsg,"should NEVER happen");
-          class_test(fabs(pri1)/sqrt(pii1*prr1)>1,errmsg,"too large ad-iso cross-correlation in k1");
-          class_test(fabs(pri1)/sqrt(pii1*prr1)*exp(n_cor*log(k2/k1))>1,errmsg,"too large ad-iso cross-correlation in k2");
+        //  class_test(fabs(pri1)/sqrt(pii1*prr1)>1,errmsg,"too large ad-iso cross-correlation in k1");
+        //  class_test(fabs(pri1)/sqrt(pii1*prr1)*exp(n_cor*log(k2/k1))>1,errmsg,"too large ad-iso cross-correlation in k2");
+        //  GFA: The two lines above are commented just for avoiding MontePython to suddenly stop
+          if (fabs(pri1)/sqrt(pii1*prr1)>1) { // if this condition is satisfied, we change to a set of physical values
+                                              // that correspond to a point very far from LCDM, so that the likelihood is
+                                              // very small and the point in the chain will be rejected.
+             ppm->P_RI_1 = 0.0;
+             ppm->P_II_1 = 1000.0*ppm->P_II_1;
+             ppm->P_II_2 = 1000.0*ppm->P_II_2;
+             pri1 = 0.0;
+             pii1 = 1000.0*pii1;
+             pii2 = 1000.0*pii2;
+          }
           c_cor = -pri1/sqrt(pii1*prr1)*exp(n_cor*log(ppm->k_pivot/k1)); /* GFA: why this - sign? */
         }
         /* formula for f_iso valid in all cases */
