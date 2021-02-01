@@ -2071,6 +2071,10 @@ int input_read_parameters(
         ppm->c_ad_cdi = c_cor;
         ppm->n_ad_cdi = n_cor;
 
+        if (pri2 == 0.) {
+          ppm->P_RI_2  = -ppm->A_s*ppm->f_cdi*ppm->c_ad_cdi*exp((0.5*(ppm->n_s+ppm->n_cdi-2.))*log(k2/ppm->k_pivot)); /* GFA: not sure about the  - sign */
+        }
+
         /* GFA: compute the corresponding parameters from Beltran parametrization */
         ppm->A_glob = ppm->A_s*(1.+pow(ppm->f_cdi,2));
         ppm->alpha_iso = pow(ppm->f_cdi,2)/(1.+pow(ppm->f_cdi,2));
