@@ -214,6 +214,8 @@ int primordial_init(
       printf("Computing primordial spectra");
   }
 
+  class_test(fabs(ppm->P_RI_1)/sqrt(ppm->P_II_1 *ppm->P_RR_1)>1,ppm->error_message,"too large ad-iso cross-correlation in k1"); // GFA, error added here to play nice with Monte Python
+
   /** - get kmin and kmax from perturbation structure. Test that they make sense. */
 
   k_min = ppt->k_min; /* first value, inferred from perturbations structure */
