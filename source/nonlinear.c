@@ -1717,6 +1717,8 @@ int nonlinear_free(
     free(pnl->pk_eq_ddw_and_ddOmega);
   }
 
+  free(pnl->is_non_zero); // GFA
+
   return _SUCCESS_;
 }
 
@@ -2272,6 +2274,15 @@ int nonlinear_pk_linear(
 
   free(primordial_pk);
   free(pk_ic);
+//  free(pnl->is_non_zero); // GFA
+  //for (index_ic1_ic2=0; index_ic1_ic2 < pnl->ic_ic_size; index_ic1_ic2++) {
+  //    free(pnl->is_non_zero[index_ic1_ic2]); // GFA
+  //   }
+
+
+
+
+
 
   return _SUCCESS_;
 
